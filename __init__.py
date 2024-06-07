@@ -1,1 +1,1 @@
-from aluno import *
+from .aluno import *

@@ -1,4 +1,4 @@
-from aluno import *
+from .aluno import *
 
 # TODO converter pra unit tests
 
