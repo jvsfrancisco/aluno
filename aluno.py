@@ -1,6 +1,7 @@
 __all__ = [ 'inicializar', 'finalizar', 'get_aluno', 'add_aluno', 'set_horario' ]
 
-import json
+import json, atexit
+from ..filial import get_filial_proxima
 
 # Aluno:
 #   id: int,
@@ -14,11 +15,11 @@ PATH = 'data/aluno.json'
 # Códigos de erro
 OPERACAO_REALIZADA_COM_SUCESSO = 0
 
-ARQUIVO_NAO_ENCONTRADO = 1
-ARQUIVO_EM_FORMATO_INVALIDO = 2
-ERRO_NA_ESCRITA_DO_ARQUIVO = 3
+ARQUIVO_NAO_ENCONTRADO = 30
+ARQUIVO_EM_FORMATO_INVALIDO = 31
+ERRO_NA_ESCRITA_DO_ARQUIVO = 32
 
-ALUNO_NAO_ENCONTRADO = 4
+ALUNO_NAO_ENCONTRADO = 16
 
 def inicializar() -> int:
     global alunos
@@ -50,10 +51,13 @@ def get_aluno(id_aluno: int) -> tuple[int, dict]:
 def add_aluno(nome: str, bairro: str, horario: list[int]) -> tuple[int, int]:
     id = len(alunos)
 
+    erro, filial = get_filial_proxima(bairro)
+    if erro != OPERACAO_REALIZADA_COM_SUCESSO: return erro
+
     alunos.append({
         'id': id,
         'nome': nome,
-        'filial_pref': bairro,  # FIXME descobrir a filial a partir do bairro
+        'filial_pref': filial,
         'horario': horario,
     })
 
@@ -66,3 +70,6 @@ def set_horario(id_aluno: int, horario_ini: int, horario_fim: int) -> int:
             return OPERACAO_REALIZADA_COM_SUCESSO
 
     return ALUNO_NAO_ENCONTRADO
+
+inicializar()
+atexit.register(finalizar)
